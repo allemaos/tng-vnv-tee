@@ -67,11 +67,11 @@ class TestExecutionEngine {
         applyTemplating(testSuite, testWorkspace, nsi)
         testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
         def debuggingMultipleResStatus = testSuiteResult.status
-        testSuiteResult.status = debuggingMultipleResStatus + '1'
+        testSuiteResult.status = debuggingMultipleResStatus + "-${testSuiteResult.uuid}-1stUpdate"
         testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
-        testSuiteResult.status = debuggingMultipleResStatus + '2'
+        testSuiteResult.status = debuggingMultipleResStatus + "-${testSuiteResult.uuid}-2ndUpdate"
         testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
-        testSuiteResult.status = debuggingMultipleResStatus + '3'
+        testSuiteResult.status = debuggingMultipleResStatus + "-${testSuiteResult.uuid}-3rdUpdate"
         testSuiteResult = testers[testSuite.type].execute(testWorkspace, testSuiteResult)
         testResultRepository.updateTestSuiteResult(testSuiteResult)
     }
