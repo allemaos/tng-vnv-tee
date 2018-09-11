@@ -66,6 +66,12 @@ class TestExecutionEngine {
         def nsi = testResultRepository.loadNetworkServiceInstance(testSuiteResult.instanceUuid)
         applyTemplating(testSuite, testWorkspace, nsi)
         testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
+        def debuggingMultipleResStatus = testSuiteResult.status
+        testSuiteResult.status = debuggingMultipleResStatus + '1'
+        testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
+        testSuiteResult.status = debuggingMultipleResStatus + '2'
+        testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
+        testSuiteResult.status = debuggingMultipleResStatus + '3'
         testSuiteResult = testers[testSuite.type].execute(testWorkspace, testSuiteResult)
         testResultRepository.updateTestSuiteResult(testSuiteResult)
     }
