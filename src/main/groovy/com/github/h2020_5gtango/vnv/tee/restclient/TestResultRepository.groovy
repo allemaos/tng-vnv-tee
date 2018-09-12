@@ -97,7 +97,7 @@ class TestResultRepository {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult.uuid} and status is $status")
+        log.info("##vnvlog-v.4.1: testSuiteResult.uuid is ${testSuiteResult.uuid} and status is $status")
         callExternalEndpoint(restTemplate.postForEntity(testSuiteResultUpdateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
     }
 
