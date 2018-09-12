@@ -89,7 +89,7 @@ class TestResultRepository {
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
         log.info("##vnvlog-v.3: testSuiteResult.uuid is ${testSuiteResult.uuid}")
-        callExternalEndpoint(restTemplate.postForEntity(testSuiteResultCreateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
+        callExternalEndpoint(restTemplate.postForEntity(testSuiteResultUpdateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
     }
 
     TestSuiteResult debuggingTestSuiteResult(TestSuiteResult testSuiteResult, def status) {
