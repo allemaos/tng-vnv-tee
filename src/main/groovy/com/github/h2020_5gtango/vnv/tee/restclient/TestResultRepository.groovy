@@ -92,6 +92,15 @@ class TestResultRepository {
         callExternalEndpoint(restTemplate.postForEntity(testSuiteResultCreateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
     }
 
+    TestSuiteResult debuggingTestSuiteResult(TestSuiteResult testSuiteResult, def status) {
+        testSuiteResult.status=status
+        def headers = new HttpHeaders()
+        headers.setContentType(MediaType.APPLICATION_JSON)
+        def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
+        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult.uuid} and status is $status")
+        callExternalEndpoint(restTemplate.postForEntity(testSuiteResultCreateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
+    }
+
     TestSuiteResult updateTestSuiteResult(TestSuiteResult testSuiteResult) {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
