@@ -36,6 +36,7 @@ package com.github.h2020_5gtango.vnv.tee.restclient
 
 import com.github.h2020_5gtango.vnv.tee.model.NetworkServiceInstance
 import com.github.h2020_5gtango.vnv.tee.model.TestSuiteResult
+import groovy.util.logging.Log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -48,6 +49,7 @@ import org.springframework.web.client.RestTemplate
 
 import static com.github.h2020_5gtango.vnv.tee.helper.DebugHelper.callExternalEndpoint
 
+@Log
 @Component
 class TestResultRepository {
 
