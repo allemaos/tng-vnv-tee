@@ -110,7 +110,7 @@ class TestCatalogue {
             targetFile.delete()
 
             def resourceUuid=packageMetadata.pd.package_content.find{it.source==testResource.source}.uuid
-            packageMetadata.pd.package_content.each{pc -> loginfo("##vnvlog-v.3: packageMetadataUuid: ${packageMetadata.uuid} testSuiteUuid: ${resourceUuid} [testSuiteResultId: ${testSuiteResultId}]")}
+            packageMetadata.pd.package_content.each{pc -> loginfo("##vnvlog-v.3: --packageMetadataUuid: ${packageMetadata.uuid} [testSuiteResultId: ${testSuiteResultId}] --testSuiteUuid: ${resourceUuid} --testResourceSource: ${testResource.source}")}
             targetFile << callExternalEndpoint(
                     restTemplate.getForEntity(resourceDownloadEndpoint,byte[].class,packageMetadata.uuid,resourceUuid),'TestCatalogue.downloadTestSuiteResources',resourceDownloadEndpoint).body
         }
