@@ -88,9 +88,9 @@ class TestResultRepository {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult.uuid} before")
+        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult?.uuid} before")
         testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.processTestSuiteResult',testSuiteResultUpdateEndpoint).body
-        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult.uuid} after")
+        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult?.uuid} after")
         testSuiteResult
     }
 
@@ -100,7 +100,7 @@ class TestResultRepository {
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
         testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.debuggingTestSuiteResult',testSuiteResultUpdateEndpoint).body
-        log.info("##vnvlog-v.4.1: testSuiteResult.uuid is ${testSuiteResult.uuid} and status is $status")
+        log.info("##vnvlog-v.4.1: testSuiteResult.uuid is ${testSuiteResult?.uuid} and status is $status")
         testSuiteResult
     }
 
@@ -108,9 +108,9 @@ class TestResultRepository {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult.uuid} before")
+        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult?.uuid} before")
         testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.updateTestSuiteResult',testSuiteResultUpdateEndpoint).body
-        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult.uuid} after")
+        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult?.uuid} after")
         testSuiteResult
     }
 
