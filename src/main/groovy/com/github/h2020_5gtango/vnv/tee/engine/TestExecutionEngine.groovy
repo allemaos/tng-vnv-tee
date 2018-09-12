@@ -59,21 +59,15 @@ class TestExecutionEngine {
 
     @PostMapping('/api/v1/test-suite-results')
     TestSuiteResult executeTestAgainstNs(@RequestBody TestSuiteResult testSuiteResult) {
-        testSuiteResult=testResultRepository.createTestSuiteResult(testSuiteResult)
-        testSuiteResult=testResultRepository.debuggingTestSuiteResult(testSuiteResult,'AFTER_CREATE')
+        testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult, 'LOADING')
         def packageMetadata = testCatalogue.loadPackageMetadata(testSuiteResult.packageId)
-        testSuiteResult=testResultRepository.debuggingTestSuiteResult(testSuiteResult,'AFTER_LOAD_PACKAGE_METADATA')
         def testSuite = testCatalogue.loadTestSuite(testSuiteResult.testUuid)
-        testSuiteResult=testResultRepository.debuggingTestSuiteResult(testSuiteResult,'AFTER_LOAD_TEST_SUITE')
         def testWorkspace = testCatalogue.downloadTestSuiteResources(packageMetadata,testSuite, testSuiteResult.uuid)
-        testSuiteResult=testResultRepository.debuggingTestSuiteResult(testSuiteResult,'AFTER_DOWNLOAD_TEST_SUITE_RESOURCES')
         def nsi = testResultRepository.loadNetworkServiceInstance(testSuiteResult.instanceUuid)
-        testSuiteResult=testResultRepository.debuggingTestSuiteResult(testSuiteResult,'AFTER_LOAD_NETWORK_SERVICE_INSTANCE')
         applyTemplating(testSuite, testWorkspace, nsi)
-        testSuiteResult=testResultRepository.debuggingTestSuiteResult(testSuiteResult,'AFTER_APPLY_TEMPLATE')
-        testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
+        testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult, 'TESTING')
         testSuiteResult = testers[testSuite.type].execute(testWorkspace, testSuiteResult)
-        testResultRepository.updateTestSuiteResult(testSuiteResult)
+        testResultRepository.processTestSuiteResult(testSuiteResult)
     }
 
     List<TestSuite.TestResource> applyTemplating(testSuite, testWorkspace, nsi) {

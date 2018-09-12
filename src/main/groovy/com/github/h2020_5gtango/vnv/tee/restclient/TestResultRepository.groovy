@@ -75,43 +75,28 @@ class TestResultRepository {
     @Value('${app.trr.test.suite.result.filter.by.test.endpoint}')
     def resultFilterByTestEndpoint
 
+    //todo: update testSuiteResultCreateEndpoint and testSuiteResultUpdateEndpoint or this method is not necessary and it will be deleted
     TestSuiteResult createTestSuiteResult(TestSuiteResult testSuiteResult) {
-        testSuiteResult.status='SCHEDULED'
+        testSuiteResult.status='LOADING'
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
         callExternalEndpoint(restTemplate.postForEntity(testSuiteResultCreateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
     }
 
-    TestSuiteResult processTestSuiteResult(TestSuiteResult testSuiteResult) {
-        testSuiteResult.status='TESTING'
-        def headers = new HttpHeaders()
-        headers.setContentType(MediaType.APPLICATION_JSON)
-        def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult?.uuid} before")
-        testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.processTestSuiteResult',testSuiteResultUpdateEndpoint).body
-        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult?.uuid} after")
-        testSuiteResult
-    }
-
-    TestSuiteResult debuggingTestSuiteResult(TestSuiteResult testSuiteResult, def status) {
+    TestSuiteResult processTestSuiteResult(TestSuiteResult testSuiteResult, String status) {
         testSuiteResult.status=status
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.debuggingTestSuiteResult',testSuiteResultUpdateEndpoint).body
-        log.info("##vnvlog-v.4.1: testSuiteResult.uuid is ${testSuiteResult?.uuid} and status is $status")
-        testSuiteResult
+        callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.processTestSuiteResult',testSuiteResultUpdateEndpoint).body
     }
 
-    TestSuiteResult updateTestSuiteResult(TestSuiteResult testSuiteResult) {
+    TestSuiteResult processTestSuiteResult(TestSuiteResult testSuiteResult) {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult?.uuid} before")
-        testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.updateTestSuiteResult',testSuiteResultUpdateEndpoint).body
-        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult?.uuid} after")
-        testSuiteResult
+        callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.updateTestSuiteResult',testSuiteResultUpdateEndpoint).body
     }
 
     NetworkServiceInstance loadNetworkServiceInstance(String instanceUuid) {
