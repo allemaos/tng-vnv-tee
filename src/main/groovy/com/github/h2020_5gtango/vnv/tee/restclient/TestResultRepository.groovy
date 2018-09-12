@@ -88,8 +88,10 @@ class TestResultRepository {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        log.info("##vnvlog-v.3: testSuiteResult.uuid is ${testSuiteResult.uuid}")
-        callExternalEndpoint(restTemplate.postForEntity(testSuiteResultUpdateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
+        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult.uuid} before")
+        testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.processTestSuiteResult',testSuiteResultUpdateEndpoint).body
+        log.info("##vnvlog-v.4: testSuiteResult.uuid is ${testSuiteResult.uuid} after")
+        testSuiteResult
     }
 
     TestSuiteResult debuggingTestSuiteResult(TestSuiteResult testSuiteResult, def status) {
@@ -97,15 +99,19 @@ class TestResultRepository {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
+        testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.debuggingTestSuiteResult',testSuiteResultUpdateEndpoint).body
         log.info("##vnvlog-v.4.1: testSuiteResult.uuid is ${testSuiteResult.uuid} and status is $status")
-        callExternalEndpoint(restTemplate.postForEntity(testSuiteResultUpdateEndpoint,entity,TestSuiteResult),'TestResultRepository.createTestSuiteResult',testSuiteResultCreateEndpoint).body
+        testSuiteResult
     }
 
     TestSuiteResult updateTestSuiteResult(TestSuiteResult testSuiteResult) {
         def headers = new HttpHeaders()
         headers.setContentType(MediaType.APPLICATION_JSON)
         def entity = new HttpEntity<TestSuiteResult>(testSuiteResult ,headers)
-        callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.updateTestSuiteResult',testSuiteResultUpdateEndpoint).body
+        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult.uuid} before")
+        testSuiteResult = callExternalEndpoint(restTemplate.exchange(testSuiteResultUpdateEndpoint, HttpMethod.PUT, entity, TestSuiteResult.class ,testSuiteResult.uuid),'TestResultRepository.updateTestSuiteResult',testSuiteResultUpdateEndpoint).body
+        log.info("##vnvlog-v.4.2: testSuiteResult.uuid is ${testSuiteResult.uuid} after")
+        testSuiteResult
     }
 
     NetworkServiceInstance loadNetworkServiceInstance(String instanceUuid) {
