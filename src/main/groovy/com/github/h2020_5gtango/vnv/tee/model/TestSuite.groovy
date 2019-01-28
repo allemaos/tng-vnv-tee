@@ -49,12 +49,37 @@ class TestSuite {
 
     String type
 
-    List<TestResource> testResources=[]
+    List<TestScenario> testScenarios =[]
+
+}
+class TestStepConfigurationResource {
+    String source
+    String target
+    String contentType
+}
 
 
-    static class TestResource{
-        String source
-        String target
-        String contentType
-    }
+class TestStepOption{
+    def option
+    def value
+}
+
+class TestStep{
+    def name
+    def image
+    def definition
+    def command
+    def index
+    def inlineCall
+    def inlineCallDefinition
+    def managementCommand
+    def commandArg
+    List options
+    List configurations
+}
+
+class TestScenario {
+    def name
+    def definition
+    List testSteps
 }

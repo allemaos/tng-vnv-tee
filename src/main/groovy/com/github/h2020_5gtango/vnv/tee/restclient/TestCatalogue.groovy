@@ -36,6 +36,10 @@ package com.github.h2020_5gtango.vnv.tee.restclient
 
 import com.github.h2020_5gtango.vnv.tee.model.PackageMetadata
 import com.github.h2020_5gtango.vnv.tee.model.Test
+import com.github.h2020_5gtango.vnv.tee.model.TestStep
+import com.github.h2020_5gtango.vnv.tee.model.TestStepConfigurationResource
+import com.github.h2020_5gtango.vnv.tee.model.TestStepOption
+import com.github.h2020_5gtango.vnv.tee.model.TestScenario
 import com.github.h2020_5gtango.vnv.tee.model.TestSuite
 import groovy.util.logging.Log
 import org.springframework.beans.factory.annotation.Autowired
@@ -90,30 +94,56 @@ class TestCatalogue {
     TestSuite loadTestSuite(String testUuid ) {
         TestSuite testSuite=callExternalEndpoint(restTemplateWithAuth.getForEntity(testSuiteLoadEndpoint,TestSuite,testUuid),'TestCatalogue.loadTestSuite',testSuiteLoadEndpoint).body
         testSuite.type=testSuite.testd.test_type
-        testSuite.testd.test_configuration_parameters.each{param->
-            if(param.containsKey('content_type')){
-                testSuite.testResources.add(new TestSuite.TestResource(
-                        contentType: param['content_type'],
-                        source: 'Tests/'+param['parameter_value'],
-                        target: param['parameter_value'],
-                ))
+        testSuite.testd.test_storylines?.each{ sl ->
+            TestScenario storyline = new TestScenario()
+            storyline.name = sl['test_storyline_name']
+            storyline.definition = sl['test_storyline_definition']
+            sl.testSteps?.each{ ts ->
+                TestStep testStep = new TestStep()
+                testStep.name = ts['test_step_name']
+                testStep.image = ts['test_step_image']
+                testStep.definition = ts['test_step_definition']
+                testStep.command = ts['test_step_command']
+                testStep.index = ts['test_step_index']
+                testStep.inlineCall = ts['test_step_inline_call']
+                testStep.inlineCallDefinition = ts['test_step_inline_call_definition']
+                testStep.managementCommand = ts['test_step_management_command']
+                testStep.commandArg = ts['test_step_command_arg']
+                ts.test_step_options?.each { o ->
+                    testStep.options.add(new TestStepOption(option: o['option'], value: o['value']))
+                }
+                ts.test_step_configurations?.each{p->
+                    if(p.containsKey('content_type')){
+                        testStep.configurations.add(new TestStepConfigurationResource(
+                                contentType: p['content_type'],
+                                source: 'Tests/'+p['parameter_value'],
+                                target: p['parameter_value'],
+                        ))
+                    }
+                }
+                storyline.testSteps.add(testStep)
             }
+            testSuite.testScenarios.add(storyline)
         }
         testSuite
     }
 
     File downloadTestSuiteResources(PackageMetadata packageMetadata,TestSuite testSuite,String testSuiteResultId) {
-        def testSuiteWorkingDir=new File(tmpDir,testSuiteResultId)
-        testSuite.testResources.each {testResource->
-            def targetFile=new File(testSuiteWorkingDir,testResource.target?:testResource.source)
-            targetFile.parentFile.mkdirs()
-            targetFile.delete()
+        def testSuiteWorkingDir = new File(tmpDir, testSuiteResultId)
+        testSuite.testScenarios?.each { scenario ->
+            scenario.testSteps?.each { step ->
+                step.configurations?.each { config ->
+                    def targetFile = new File(testSuiteWorkingDir, config.target ?: config.source)
+                    targetFile.parentFile.mkdirs()
+                    targetFile.delete()
 
-            packageMetadata.pd.package_content.each{pc -> loginfo("##vnvlog: testResource.source: ${testResource.source} while package_content [source: ${pc.source} ")}
-            def resourceUuid=packageMetadata.pd.package_content.find{it.source==testResource.source}.uuid
-            targetFile << callExternalEndpoint(
-                    restTemplate.getForEntity(resourceDownloadEndpoint,byte[].class,packageMetadata.uuid,resourceUuid),'TestCatalogue.downloadTestSuiteResources',resourceDownloadEndpoint).body
+                    packageMetadata.pd.package_content.each { pc -> loginfo("##vnvlog: config.source: ${config.source} while package_content [source: ${pc.source} ") }
+                    def configUuid = packageMetadata.pd.package_content.find { it.source == config.source }.uuid
+                    targetFile << callExternalEndpoint(
+                            restTemplate.getForEntity(resourceDownloadEndpoint, byte[].class, packageMetadata.uuid, configUuid), 'TestCatalogue.downloadTestSuiteTestStepConfig', resourceDownloadEndpoint).body
+                }
         }
+    }
         testSuiteWorkingDir
     }
 

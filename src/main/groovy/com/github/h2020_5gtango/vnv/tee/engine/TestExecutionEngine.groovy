@@ -34,7 +34,7 @@
 
 package com.github.h2020_5gtango.vnv.tee.engine
 
-import com.github.h2020_5gtango.vnv.tee.model.TestSuite
+
 import com.github.h2020_5gtango.vnv.tee.model.TestSuiteResult
 import com.github.h2020_5gtango.vnv.tee.restclient.TestCatalogue
 import com.github.h2020_5gtango.vnv.tee.restclient.TestResultRepository
@@ -66,24 +66,28 @@ class TestExecutionEngine {
         def nsi = testResultRepository.loadNetworkServiceInstance(testSuiteResult.instanceUuid)
         applyTemplating(testSuite, testWorkspace, nsi)
         testSuiteResult=testResultRepository.processTestSuiteResult(testSuiteResult)
+        //fixme: need to execute testScenarios and testSteps. Previous version had only only one result. The update will have results
         testSuiteResult = testers[testSuite.type].execute(testWorkspace, testSuiteResult)
         testResultRepository.updateTestSuiteResult(testSuiteResult)
     }
 
-    List<TestSuite.TestResource> applyTemplating(testSuite, testWorkspace, nsi) {
-        testSuite.testResources.each { testResource ->
-            if (testResource.contentType.contains('text')) {
-                def targetFile = new File(testWorkspace, testResource.target ?: testResource.source)
-                def binding = [
-                        nsi      : nsi,
-                        testSuite: testSuite,
-                        workspace: testWorkspace,
-                ]
-                def replacedText = new SimpleTemplateEngine().createTemplate(targetFile.text).make(binding).toString()
-                targetFile.delete()
-                targetFile << replacedText
+    void applyTemplating(testSuite, testWorkspace, nsi) {
+        testSuite.TestScenario?.each { scenario ->
+            scenario.TestStep?.each { step ->
+                step.configurations?.each { config ->
+                    if (config.contentType.contains('text')) {
+                        def targetFile = new File(testWorkspace, config.target ?: config.source)
+                        def binding = [
+                                nsi      : nsi,
+                                testSuite: testSuite,
+                                workspace: testWorkspace,
+                        ]
+                        def replacedText = new SimpleTemplateEngine().createTemplate(targetFile.text).make(binding).toString()
+                        targetFile.delete()
+                        targetFile << replacedText
+                    }
+                }
             }
         }
     }
-
 }
